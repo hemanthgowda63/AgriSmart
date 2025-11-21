@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Scan Crop Disease{% endblock %}
+{% block content %}
+
+<div class="section-title">
+  <i class="bi bi-qr-code-scan"></i>
+  <div>
+    <h3 class="mb-0">Scan & Detect Crop Disease</h3>
+    <small class="text-muted">
+      Upload a clear leaf image and let the Roboflow model predict the disease.
+    </small>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Upload card -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-camera me-1"></i> Upload Leaf Image
+        </h5>
+        <form method="post" enctype="multipart/form-data" id="scan-form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Choose image file</label>
+            <input
+              type="file"
+              name="image"
+              id="image-input"
+              class="form-control"
+              accept="image/*"
+              required
+            >
+            <div class="form-text">
+              Try to capture a single leaf clearly with good lighting.
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-play-circle me-1"></i> Scan Now
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview + Result card -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-activity me-1"></i> Result
+        </h5>
+
+        {% if error %}
+          <div class="alert alert-danger">
+            {{ error }}
+          </div>
+        {% endif %}
+
+        <!-- Image preview -->
+        <div class="mb-3">
+          <label class="form-label">Preview</label>
+          <div class="border rounded p-2 text-center" style="min-height: 180px;">
+            {% if uploaded_image_url %}
+              <img id="preview-img" src="{{ uploaded_image_url }}" alt="Leaf preview" class="img-fluid rounded">
+            {% else %}
+              <img id="preview-img" src="" alt="Leaf preview" class="img-fluid rounded d-none">
+              <p class="text-muted mb-0 small">
+                No image selected yet.
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Prediction result -->
+        {% if result %}
+          <div class="alert alert-info">
+            <strong>Disease:</strong> {{ result.disease }}<br>
+            <strong>Confidence:</strong> {{ result.confidence }}%
+          </div>
+
+          <p class="small text-muted mb-0">
+            <strong>Note:</strong> Prediction is powered by a Roboflow model.
+            Farmers should confirm with local agriculture experts before taking critical actions.
+          </p>
+        {% else %}
+          <p class="text-muted small">
+            After uploading a leaf photo and clicking <strong>Scan Now</strong>, the predicted disease
+            and confidence will appear here.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Simple client-side preview
+  const imageInput = document.getElementById('image-input');
+  const previewImg = document.getElementById('preview-img');
+
+  if (imageInput) {
+    imageInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        previewImg.src = e.target.result;
+        previewImg.classList.remove('d-none');
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>
+{% endblock %}

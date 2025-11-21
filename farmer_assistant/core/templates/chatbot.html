@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}AI Chatbot{% endblock %}
+{% block content %}
+
+<div class="section-title">
+  <i class="bi bi-robot"></i>
+  <div>
+    <h3 class="mb-0">Farmer Assistant Chatbot (Gemini)</h3>
+    <small class="text-muted">
+      Ask your doubts about crops, fertilizer, water, pests, and more.
+    </small>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div id="chat-box"
+         style="height:320px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:8px; padding:10px; background:white;">
+      <div class="text-muted small mb-2">
+        <strong>Bot:</strong> Vanakkam / Namaskara! 👋 I am powered by Gemini AI. Ask me your farming question.
+      </div>
+    </div>
+
+    <div class="input-group mt-3">
+      <input id="user-input" type="text" class="form-control" placeholder="Type your question here...">
+      <button id="send-btn" class="btn btn-success">
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const chatBox = document.getElementById('chat-box');
+  const userInput = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+
+  function addMessage(sender, text) {
+    const div = document.createElement('div');
+    div.classList.add('mb-2', 'small');
+    div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function sendMessage() {
+    const message = userInput.value.trim();
+    if (!message) return;
+
+    addMessage('You', message);
+    userInput.value = '';
+
+    fetch("{% url 'chatbot' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'message=' + encodeURIComponent(message)
+    })
+    .then(response => response.json())
+    .then(data => {
+      addMessage('Bot', data.reply);
+    })
+    .catch(err => {
+      addMessage('Bot', 'Error contacting server. Please try again.');
+    });
+  }
+
+  sendBtn.addEventListener('click', function() {
+    sendMessage();
+  });
+
+  userInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+</script>
+{% endblock %}
