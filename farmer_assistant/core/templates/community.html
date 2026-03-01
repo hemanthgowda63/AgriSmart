@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Community{% endblock %}
+{% block content %}
+<h3>Farmer Discussion Community</h3>
+
+<form method="post" class="mb-4">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Question / Discussion</label>
+    <textarea name="content" rows="3" class="form-control" required></textarea>
+  </div>
+  <button type="submit" class="btn btn-success">Post</button>
+</form>
+
+<h5>Recent Posts</h5>
+{% for post in posts %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6>{{ post.title }}</h6>
+      <p>{{ post.content }}</p>
+      <small class="text-muted">
+        By {{ post.user.username }} on {{ post.created_at }}
+      </small>
+    </div>
+  </div>
+{% empty %}
+  <p>No posts yet.</p>
+{% endfor %}
+{% endblock %}

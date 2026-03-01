@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Weather{% endblock %}
+{% block content %}
+<h3>Weather & Future Prediction</h3>
+
+<form method="post" class="row g-3 mb-4">
+  {% csrf_token %}
+  <div class="col-auto">
+    <input type="text" name="city" class="form-control" placeholder="Enter city name" required>
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-success">Get Weather</button>
+  </div>
+</form>
+
+{% if weather_data %}
+  {% if weather_data.error %}
+    <div class="alert alert-danger">{{ weather_data.error }}</div>
+  {% else %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>{{ weather_data.city|title }}</h5>
+        <p>
+          <strong>Now:</strong>
+          {{ weather_data.current.main.temp }} °C,
+          {{ weather_data.current.weather.0.description }}
+        </p>
+      </div>
+    </div>
+
+    <h5>Upcoming Forecast</h5>
+    <div class="row">
+      {% for item in weather_data.forecast %}
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <p><strong>{{ item.dt_txt }}</strong></p>
+              <p>Temp: {{ item.main.temp }} °C</p>
+              <p>{{ item.weather.0.description }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock %}

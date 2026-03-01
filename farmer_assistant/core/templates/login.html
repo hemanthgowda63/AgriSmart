@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-body">
+        <h3 id="page-title" class="mb-3 text-center">Farmer Assistant</h3>
+
+        <!-- Language selector -->
+        <div class="mb-3">
+          <label class="form-label" id="language-label">Choose Language</label>
+          <select id="language-select" class="form-select">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="ta">தமிழ்</option>
+            <option value="kn">ಕನ್ನಡ</option>
+          </select>
+        </div>
+
+        {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label id="email-label" class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label id="password-label" class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+          <button id="login-button" type="submit" class="btn btn-success w-100">Login</button>
+        </form>
+        <p class="mt-3 text-center">
+          <span id="no-account-text">Don't have an account?</span>
+          <a href="{% url 'signup' %}" id="signup-link-text">Sign up</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const translations = {
+    en: {
+      title: "Farmer Assistant",
+      chooseLanguage: "Choose Language",
+      email: "Email",
+      password: "Password",
+      login: "Login",
+      noAccount: "Don't have an account?",
+      signup: "Sign up"
+    },
+    hi: {
+      title: "किसान सहायक",
+      chooseLanguage: "भाषा चुनें",
+      email: "ईमेल",
+      password: "पासवर्ड",
+      login: "लॉगिन",
+      noAccount: "खाता नहीं है?",
+      signup: "साइन अप"
+    },
+    ta: {
+      title: "விவசாய உதவியாளர்",
+      chooseLanguage: "மொழியை தேர்வு செய்க",
+      email: "மின்னஞ்சல்",
+      password: "கடவுச்சொல்",
+      login: "உள்நுழைக",
+      noAccount: "கணக்கு இல்லையா?",
+      signup: "பதிவு செய்க"
+    },
+    kn: {
+      title: "ರೈತ ಸಹಾಯಕ",
+      chooseLanguage: "ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+      email: "ಇಮೇಲ್",
+      password: "ಪಾಸ್ವರ್ಡ್",
+      login: "ಲಾಗಿನ್",
+      noAccount: "ಖಾತೆ ಇಲ್ಲವೇ?",
+      signup: "ಸೈನ್ ಅಪ್"
+    }
+  };
+
+  const langSelect = document.getElementById('language-select');
+
+  function updateTexts(lang) {
+    const t = translations[lang];
+    document.getElementById('page-title').innerText = t.title;
+    document.getElementById('language-label').innerText = t.chooseLanguage;
+    document.getElementById('email-label').innerText = t.email;
+    document.getElementById('password-label').innerText = t.password;
+    document.getElementById('login-button').innerText = t.login;
+    document.getElementById('no-account-text').innerText = t.noAccount;
+    document.getElementById('signup-link-text').innerText = t.signup;
+  }
+
+  langSelect.addEventListener('change', function() {
+    updateTexts(this.value);
+  });
+
+  // default
+  updateTexts('en');
+</script>
+{% endblock %}

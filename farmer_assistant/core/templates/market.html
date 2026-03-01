@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Market Prices{% endblock %}
+{% block content %}
+
+<div class="section-title">
+  <i class="bi bi-cash-coin"></i>
+  <div>
+    <h3 class="mb-0">Live Market Prices</h3>
+    <small class="text-muted">
+      Check commodity prices across major markets. Data is indicative; confirm at local mandi or agri portals.
+    </small>
+  </div>
+</div>
+
+<div class="mb-4">
+  <input type="text" id="market-search" class="form-control form-control-lg" placeholder="Search by commodity, market or state...">
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-success">
+      <tr>
+        <th>Commodity</th>
+        <th>Market</th>
+        <th>State</th>
+        <th class="text-end">Price</th>
+        <th>Unit</th>
+        <th class="text-center">Trend</th>
+      </tr>
+    </thead>
+    <tbody id="market-tbody">
+      {% for row in market_data %}
+      <tr class="market-row" data-commodity="{{ row.commodity|lower }}" data-market="{{ row.market|lower }}" data-state="{{ row.state|lower }}">
+        <td><strong>{{ row.commodity }}</strong></td>
+        <td>{{ row.market }}</td>
+        <td>{{ row.state }}</td>
+        <td class="text-end">
+          <span class="text-dark fw-semibold">₹ {{ row.price }}</span>
+        </td>
+        <td><span class="text-muted">/ {{ row.unit }}</span></td>
+        <td class="text-center">
+          {% if row.trend == "up" %}
+            <span class="badge bg-success"><i class="bi bi-arrow-up-short"></i> Up</span>
+          {% elif row.trend == "down" %}
+            <span class="badge bg-danger"><i class="bi bi-arrow-down-short"></i> Down</span>
+          {% else %}
+            <span class="badge bg-secondary">— Same</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p class="small text-muted mt-3 mb-0">
+  <i class="bi bi-info-circle me-1"></i>
+  For official and real-time mandi prices, visit
+  <a href="https://agmarknet.gov.in" target="_blank" rel="noopener">agmarknet.gov.in</a> or your state agriculture department portal.
+</p>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const search = document.getElementById('market-search');
+    const rows = document.querySelectorAll('.market-row');
+
+    if (search && rows.length) {
+      search.addEventListener('input', function () {
+        const q = this.value.trim().toLowerCase();
+        rows.forEach(function (tr) {
+          const show = !q ||
+            tr.dataset.commodity.includes(q) ||
+            tr.dataset.market.includes(q) ||
+            tr.dataset.state.includes(q);
+          tr.style.display = show ? '' : 'none';
+        });
+      });
+    }
+  })();
+</script>
+{% endblock %}
